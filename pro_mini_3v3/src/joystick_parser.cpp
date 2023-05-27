@@ -9,17 +9,17 @@ void JoystickReportParser::Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8
   // checking if there are changes in report since the method was last called
   if (memcmp(oldPad, buf, RPT_JOYSTICK_LEN) != 0 && joyEvents)
   {
+    is_data_changed = true;
     data = (JoystickEventData *)buf;
-    is_data_new = true;
     // calling event handler
-    // joyEvents->OnGamePadChanged((const JoystickEventData*)buf);
+    // joyEvents->OnJoystickChanged((const JoystickEventData*)buf);
     memcpy(oldPad, buf, RPT_JOYSTICK_LEN);
   }
   else
-    is_data_new = false;
+    is_data_changed = false;
 }
 
-void JoystickEvents::OnGamePadChanged(const JoystickEventData *evt)
+void JoystickEvents::OnJoystickChanged(const JoystickEventData *evt)
 {
   Serial.print("X: ");
   Serial.print(evt->x);

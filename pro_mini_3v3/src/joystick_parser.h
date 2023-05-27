@@ -18,7 +18,7 @@ struct JoystickEventData
 class JoystickEvents
 {
 public:
-  virtual void OnGamePadChanged(const JoystickEventData *evt);
+  virtual void OnJoystickChanged(const JoystickEventData *evt);
 };
 
 class JoystickReportParser : public HIDReportParser
@@ -27,7 +27,7 @@ class JoystickReportParser : public HIDReportParser
   uint8_t oldPad[RPT_JOYSTICK_LEN];
 
 public:
-  bool is_data_new;
+  bool is_data_changed;
   JoystickEventData *data;
 
   JoystickReportParser(JoystickEvents *evt);

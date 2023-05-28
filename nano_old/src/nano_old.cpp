@@ -9,7 +9,7 @@
 #define PITCH_IN A4
 #define THRUST_IN A5
 
-RF24 radio(9, 10);                                                          // radio module pins
+RF24 radio(9, 10); // radio module pins
 byte address[][6] = {"1Node", "2Node", "3Node", "4Node", "5Node", "6Node"}; // possible pipes numbers
 
 byte transmit_data[5];

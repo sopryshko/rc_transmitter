@@ -10,7 +10,7 @@
 #define PITCH_IN A2
 #define YAW_IN A3
 
-RF24 radio(9, 10);                                                          // radio module pins
+RF24 radio(9, 10); // radio module pins
 byte address[][6] = {"1Node", "2Node", "3Node", "4Node", "5Node", "6Node"}; // possible pipes numbers
 
 int mode = 0;
@@ -83,6 +83,8 @@ void read_mode()
 
 void read_controllers()
 {
+  read_mode();
+  
   int thrust_val = map(analogRead(THRUST_IN), 0, 1023, 0, 255);
   transmit_data[1] = thrust_val;
 
@@ -121,7 +123,6 @@ void send_data()
 
 void loop()
 {
-  read_mode();
   read_controllers();
   // checking if there are changes in data
   if (memcmp(transmit_data, previous_data, sizeof(transmit_data)) != 0)

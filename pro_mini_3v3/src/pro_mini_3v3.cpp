@@ -10,7 +10,13 @@
 #include <spi4teensy3.h>
 #endif
 #include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
 
+#define CE_PIN_RADIO 7
+#define CSN_PIN_RADIO 8
+#define SS_PIN_USB 10 // standard SS pin for USB Host Shield
+#define CHAN_NUM 0x7A // radio channel (transmitter = receiver)
 #define MODE_BUTTON 0x02
 
 USB Usb;
@@ -19,15 +25,16 @@ HIDUniversal Hid(&Usb);
 JoystickEvents JoyEvents;
 JoystickReportParser Joy(&JoyEvents);
 
+RF24 radio(CE_PIN_RADIO, CSN_PIN_RADIO); // radio module pins
+byte address[][6] = {"1Node", "2Node", "3Node", "4Node", "5Node", "6Node"}; // possible pipes numbers
+
 int mode = 0;
 byte transmit_data[5];
 byte previous_data[5];
 
-void setup()
+void usb_host_shield_init()
 {
-  Serial.begin(115200);
-
-#if !defined(__MIPSEL__)
+  #if !defined(__MIPSEL__)
   while (!Serial)
     ; // wait for serial port to connect - used on Leonardo, Teensy and other boards with built-in USB CDC serial connection
 #endif
@@ -43,6 +50,34 @@ void setup()
     ErrorMessage<uint8_t>(PSTR("SetReportParser"), 1);
 }
 
+void transmitter_init()
+{
+  radio.begin(); // radio module activation
+  radio.setAutoAck(true); // respond to the received packet (transmitter = receiver)
+  radio.setRetries(0, 15); // number of retry attempts and delay
+  radio.enableAckPayload();
+  radio.setPayloadSize(32); // packet size (bytes)
+
+  radio.openWritingPipe(address[0]); // transmitter
+  radio.setChannel(CHAN_NUM);
+
+  radio.setPALevel(RF24_PA_MAX); // RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX (transmitter = receiver)
+  // the lower the data rate, the higher the range
+  radio.setDataRate(RF24_250KBPS); // RF24_2MBPS, RF24_1MBPS, RF24_250KBPS (transmitter = receiver)
+
+  radio.powerUp();
+  radio.stopListening(); // transmitter
+}
+
+void setup()
+{
+  Serial.begin(115200);
+
+  pinMode(SS_PIN_USB, OUTPUT);
+  usb_host_shield_init();
+  transmitter_init();
+}
+
 void read_mode()
 {
   if (Joy.data->buttons & MODE_BUTTON)
@@ -56,6 +91,8 @@ void read_mode()
 
 void read_data()
 {
+  read_mode();
+
   int thrust_val = map(Joy.data->slider, 0, 255, 255, 0);
   transmit_data[1] = thrust_val;
 
@@ -84,18 +121,19 @@ void print_data()
 
 void send_data()
 {
-  // radio.powerUp();
-  // radio.write(&transmit_data, sizeof(transmit_data)); // send packet
-  // radio.powerDown();
+  radio.powerUp();
+  radio.write(&transmit_data, sizeof(transmit_data)); // send packet
+  radio.powerDown();
 }
 
 void loop()
 {
+  digitalWrite(SS_PIN_USB, LOW);
   Usb.Task();
+  digitalWrite(SS_PIN_USB, HIGH);
 
   if (Joy.is_data_changed)
   {
-    read_mode();
     read_data();
 
     if (memcmp(transmit_data, previous_data, sizeof(transmit_data)) != 0)

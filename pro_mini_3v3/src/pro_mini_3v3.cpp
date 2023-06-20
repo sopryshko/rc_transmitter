@@ -13,8 +13,8 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 
-#define CE_PIN_RADIO 7
-#define CSN_PIN_RADIO 8
+#define CSN_PIN_RADIO 2
+#define CE_PIN_RADIO 3
 #define SS_PIN_USB 10 // standard SS pin for USB Host Shield
 #define CHAN_NUM 0x7A // radio channel (transmitter = receiver)
 #define MODE_BUTTON 0x02

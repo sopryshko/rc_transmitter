@@ -13,14 +13,14 @@
 RF24 radio(9, 10); // radio module pins
 byte address[][6] = {"1Node", "2Node", "3Node", "4Node", "5Node", "6Node"}; // possible pipes numbers
 
+byte transmit_data[5];
+byte previous_data[5];
+
 int mode = 0;
 int cur_button_state = HIGH;
 int prev_button_state = HIGH;
 unsigned long prev_debounce_time = 0;
 unsigned long debounce_delay = 20;
-
-byte transmit_data[5];
-byte previous_data[5];
 
 void transmitter_init()
 {

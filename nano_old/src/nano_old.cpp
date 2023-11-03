@@ -54,11 +54,11 @@ void read_controllers()
   transmit_data[2] = roll_val;
 
   int pitch_val = analogRead(PITCH_IN);
-  pitch_val = map(pitch_val, 0, 1023, 35, 145);
+  pitch_val = map(pitch_val, 0, 1023, 140, 40);
   transmit_data[3] = pitch_val;
 
   int yaw_val = analogRead(YAW_IN);
-  yaw_val = map(yaw_val, 0, 1023, 150, 30);
+  yaw_val = map(yaw_val, 0, 1023, 140, 40);
   transmit_data[4] = yaw_val;
 }
 

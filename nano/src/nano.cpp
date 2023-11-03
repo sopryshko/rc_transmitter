@@ -7,8 +7,8 @@
 #define BUTTON 2
 #define THRUST_IN A0
 #define ROLL_IN A1
-#define PITCH_IN A2
-#define YAW_IN A3
+#define YAW_IN A2
+#define PITCH_IN A3
 
 RF24 radio(9, 10); // radio module pins
 byte address[][6] = {"1Node", "2Node", "3Node", "4Node", "5Node", "6Node"}; // possible pipes numbers
@@ -93,11 +93,11 @@ void read_controllers()
   transmit_data[2] = roll_val;
 
   int pitch_val = analogRead(PITCH_IN);
-  pitch_val = map(pitch_val, 0, 1023, 35, 145);
+  pitch_val = map(pitch_val, 0, 1023, 140, 40);
   transmit_data[3] = pitch_val;
 
   int yaw_val = analogRead(YAW_IN);
-  yaw_val = map(yaw_val, 0, 1023, 30, 150);
+  yaw_val = map(yaw_val, 0, 1023, 140, 40);
   transmit_data[4] = yaw_val;
 }
 

@@ -99,10 +99,10 @@ void read_data()
   int roll_val = map(Joy.data->x, 0, 16383, 140, 40);
   transmit_data[2] = roll_val;
 
-  int pitch_val = map(Joy.data->y, 0, 16383, 35, 145);
+  int pitch_val = map(Joy.data->y, 0, 16383, 140, 40);
   transmit_data[3] = pitch_val;
 
-  int yaw_val = map(Joy.data->twist, 0, 255, 150, 30);
+  int yaw_val = map(Joy.data->twist, 0, 255, 140, 40);
   transmit_data[4] = yaw_val;
 }
 

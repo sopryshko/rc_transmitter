@@ -17,7 +17,7 @@
 #define CE_PIN_RADIO 3
 #define SS_PIN_USB 10 // standard SS pin for USB Host Shield
 #define CHAN_NUM 0x7A // radio channel (transmitter = receiver)
-#define MODE_BUTTON 0x02
+#define GEARS_BUTTON 0x02
 
 USB Usb;
 USBHub Hub(&Usb);
@@ -28,7 +28,7 @@ JoystickReportParser Joy(&JoyEvents);
 RF24 radio(CE_PIN_RADIO, CSN_PIN_RADIO); // radio module pins
 byte address[][6] = {"1Node", "2Node", "3Node", "4Node", "5Node", "6Node"}; // possible pipes numbers
 
-int mode = 0;
+int gears_mode = 0;
 byte transmit_data[5];
 byte previous_data[5];
 
@@ -78,38 +78,41 @@ void setup()
   transmitter_init();
 }
 
-void read_mode()
+int read_mode(int button, int prev_mode)
 {
-  if (Joy.data->buttons & MODE_BUTTON)
+  int cur_mode = prev_mode;
+
+  if (Joy.data->buttons & button)
   {
-    mode++;
-    mode %= 2;
+    cur_mode++;
+    cur_mode %= 2;
   }
 
-  transmit_data[0] = mode;
+  return cur_mode;
 }
 
 void read_data()
 {
-  read_mode();
-
   int thrust_val = map(Joy.data->slider, 0, 255, 255, 0);
-  transmit_data[1] = thrust_val;
+  transmit_data[0] = thrust_val;
 
-  int roll_val = map(Joy.data->x, 0, 16383, 140, 40);
-  transmit_data[2] = roll_val;
+  int roll_val = map(Joy.data->x, 0, 16383, 120, 60);
+  transmit_data[1] = roll_val;
 
-  int pitch_val = map(Joy.data->y, 0, 16383, 140, 40);
-  transmit_data[3] = pitch_val;
+  int pitch_val = map(Joy.data->y, 0, 16383, 120, 60);
+  transmit_data[2] = pitch_val;
 
-  int yaw_val = map(Joy.data->twist, 0, 255, 140, 40);
-  transmit_data[4] = yaw_val;
+  int yaw_val = map(Joy.data->twist, 0, 255, 120, 60);
+  transmit_data[3] = yaw_val;
+
+  gears_mode = read_mode(GEARS_BUTTON, gears_mode);
+  transmit_data[4] = map(gears_mode, 0, 1, 128, 64);
 }
 
 void print_data()
 {
   size_t data_size = sizeof(transmit_data) / sizeof(transmit_data[0]);
-  // mode thrust roll pitch yaw
+  // thrust roll pitch yaw gears
   for (size_t i = 0; i < data_size; i++)
   {
     Serial.print(transmit_data[i]);

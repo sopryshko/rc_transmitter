@@ -42,30 +42,29 @@ void setup()
 
 void read_controllers()
 {
-  
-  int mode = 0; // for compatibility
-  transmit_data[0] = mode;
-
   int thrust_val = map(analogRead(THRUST_IN), 0, 1023, 0, 255);
-  transmit_data[1] = thrust_val;
+  transmit_data[0] = thrust_val;
 
   int roll_val = analogRead(ROLL_IN);
-  roll_val = map(roll_val, 0, 1023, 40, 140);
-  transmit_data[2] = roll_val;
+  roll_val = map(roll_val, 0, 1023, 60, 120);
+  transmit_data[1] = roll_val;
 
   int pitch_val = analogRead(PITCH_IN);
-  pitch_val = map(pitch_val, 0, 1023, 140, 40);
-  transmit_data[3] = pitch_val;
+  pitch_val = map(pitch_val, 0, 1023, 120, 60);
+  transmit_data[2] = pitch_val;
 
   int yaw_val = analogRead(YAW_IN);
-  yaw_val = map(yaw_val, 0, 1023, 140, 40);
-  transmit_data[4] = yaw_val;
+  yaw_val = map(yaw_val, 0, 1023, 120, 60);
+  transmit_data[3] = yaw_val;
+
+  int gears_mode = 128; // for compatibility
+  transmit_data[4] = gears_mode;
 }
 
 void print_data()
 {
   size_t data_size = sizeof(transmit_data) / sizeof(transmit_data[0]);
-  // mode thrust roll pitch yaw
+  // thrust roll pitch yaw gears
   for (size_t i = 0; i < data_size; i++)
   {
     Serial.print(transmit_data[i]);
